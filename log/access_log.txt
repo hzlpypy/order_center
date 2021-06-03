@@ -1,0 +1,2 @@
+time="2021-05-26T17:00:36+08:00" level=info msg=access func="order_center/middleware.(*M).Access" file="/home/huangzhilin/go/src/order_center/middleware/index.go:15"
+time="2021-05-26T17:00:37+08:00" level=info msg="req time = 1s" func="order_center/middleware.(*M).Access" file="/home/huangzhilin/go/src/order_center/middleware/index.go:18"
