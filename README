@@ -1,8 +1,7 @@
 # 分布式事务测试
-
 组件：
-    1.order_center 订单系统(go,mysql,http,logrus)
+    1.order_center 订单系统(go,mysql,gin,logrus)
     2.notify 通知系统(go,rabbitmq,grpc,logrus)
     3.waybill_center 运单系统(go,mysql,grpc,logrus)
-    4.nameservice 名字服务(etcd,go,logrus)
+    4.nameservice 名字服务(etcd,go,logrus,grpc)
 
