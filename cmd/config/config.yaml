@@ -2,6 +2,7 @@ model: debug # release debug
 server:
   ip: 127.0.0.1
   port: 8089
+  name: order_center
 rabbitmq:
   ip: 127.0.0.1
   port: 6379
@@ -21,3 +22,5 @@ mysql:
 log:
   access_path: ./log/access_log.txt
   error_path: ./log/error_log.txt
+etcd:
+  ttl: 10

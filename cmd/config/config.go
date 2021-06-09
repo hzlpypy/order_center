@@ -13,6 +13,7 @@ type Config struct {
 	Server struct {
 		Ip   string `yaml:"ip"`
 		Port int    `yaml:"port"`
+		Name string `yaml:"name"`
 	} `yaml:"server"`
 	Rabbitmq struct {
 		Ip   string `yaml:"ip"`
@@ -36,6 +37,9 @@ type Config struct {
 		AccessPath string `yaml:"access_path"`
 		ErrorPath  string `yaml:"error_path"`
 	} `yaml:"log"`
+	Etcd struct {
+		Ttl int `yaml:"ttl"`
+	} `yaml:"etcd"`
 }
 
 func NewConfig() *Config {
