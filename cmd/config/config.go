@@ -16,8 +16,7 @@ type Config struct {
 		Name string `yaml:"name"`
 	} `yaml:"server"`
 	Rabbitmq struct {
-		Ip   string `yaml:"ip"`
-		Port int    `yaml:"port"`
+		Name string `yaml:"name"`
 		User string `yaml:"user"`
 		Pwd  string `yaml:"pwd"`
 	} `yaml:"rabbitmq"`

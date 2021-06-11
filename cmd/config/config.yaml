@@ -4,8 +4,7 @@ server:
   port: 8089
   name: order_center
 rabbitmq:
-  ip: 127.0.0.1
-  port: 6379
+  name: logic.rabbitmq
   user: admin
   pwd: admin
 mysql:

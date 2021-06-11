@@ -135,8 +135,14 @@ github.com/hashicorp/memberlist v0.1.3/go.mod h1:ajVTdAv/9Im8oMAAj5G31PhhMCZJV2p
 github.com/hashicorp/serf v0.8.2/go.mod h1:6hOLApaqBFA1NXqRQAsxw9QxuDEvNxSQRwA/JwenrHc=
 github.com/hzlpypy/common v0.0.0-20210608093228-64ba25f94c1a h1:yi1Yunl3/NXCh5v5o6+4vcuO6k4kZ+juYSVfjA+4zo0=
 github.com/hzlpypy/common v0.0.0-20210608093228-64ba25f94c1a/go.mod h1:OGAmbCjHonm4+2U8+VUlqHhebsQxuAjz5NFeFWQqerA=
+github.com/hzlpypy/common v0.0.0-20210611092741-0b0a76672e9b h1:26twGzWbSpbhCDWVCKPN32bEbda3Zhtxwrg9HOesNMA=
+github.com/hzlpypy/common v0.0.0-20210611092741-0b0a76672e9b/go.mod h1:1LR5KHPO2RvPmJN/+vxvsj0FSqrpByRzsxwD5dsJCgA=
 github.com/hzlpypy/grpc-lb v0.0.0-20210609083400-b83760d44182 h1:dkfXxZOz+DhuCfxxYjo87TQeAnsm9m0isHZF6mDK8PU=
 github.com/hzlpypy/grpc-lb v0.0.0-20210609083400-b83760d44182/go.mod h1:oRER0+cU2WSfnkhEjDqsdtoi1Wx4EdVV9hi1+zL8+/w=
+github.com/hzlpypy/grpc-lb v0.0.0-20210610100903-5b877da04e89 h1:9t6L86zDUXUmA1P61Uf3oPtTBzQTeExtlCdA8Q9e1hQ=
+github.com/hzlpypy/grpc-lb v0.0.0-20210610100903-5b877da04e89/go.mod h1:oRER0+cU2WSfnkhEjDqsdtoi1Wx4EdVV9hi1+zL8+/w=
+github.com/hzlpypy/grpc-lb v0.0.0-20210611071240-b3a4033c714e h1:yQlB2uzEaw+UZogqauIbeZpBF5JTuTHGSKcDvrCpIAo=
+github.com/hzlpypy/grpc-lb v0.0.0-20210611071240-b3a4033c714e/go.mod h1:oRER0+cU2WSfnkhEjDqsdtoi1Wx4EdVV9hi1+zL8+/w=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/jinzhu/gorm v1.9.16/go.mod h1:G3LB3wezTOWM2ITLzPxEXgSkOXAntiLHS7UdBefADcs=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=

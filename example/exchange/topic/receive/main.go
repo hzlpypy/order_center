@@ -29,6 +29,7 @@ func main() {
 		0,     // prefetch size
 		false, // global
 	)
+	// 创建队列
 	q, err := ch.QueueDeclare(
 		"",
 		false,
@@ -50,6 +51,7 @@ func main() {
 			"test_topic", // exchange
 			false,
 			nil)
+
 		failOnError(err, "Failed to bind a queue")
 	}
 	msgs, err := ch.Consume(

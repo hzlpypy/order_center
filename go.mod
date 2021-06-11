@@ -4,8 +4,8 @@ go 1.15
 
 require (
 	github.com/gin-gonic/gin v1.7.2
-	github.com/hzlpypy/common v0.0.0-20210608093228-64ba25f94c1a
-	github.com/hzlpypy/grpc-lb v0.0.0-20210609083400-b83760d44182
+	github.com/hzlpypy/common v0.0.0-20210611092741-0b0a76672e9b
+	github.com/hzlpypy/grpc-lb v0.0.0-20210611071240-b3a4033c714e // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/streadway/amqp v1.0.0
 	go.etcd.io/etcd v0.0.0-20200402134248-51bdeb39e698

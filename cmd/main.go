@@ -12,6 +12,7 @@ import (
 	"github.com/hzlpypy/grpc-lb/common"
 	"github.com/hzlpypy/grpc-lb/registry"
 	etcd3 "github.com/hzlpypy/grpc-lb/registry/etcd3"
+	"github.com/streadway/amqp"
 	"go.etcd.io/etcd/clientv3"
 	"google.golang.org/grpc/metadata"
 	"gorm.io/gorm/logger"
@@ -29,37 +30,35 @@ func main() {
 	flag.Parse()
 	cf := config.NewConfig()
 	e := gin.Default()
-	//
+	// local ip
 	ip, _ := utils.ExternalIP()
 	// register to etcd
-	go func() {
-		nameServiceMap, err := name_service.GetNameService()
-		if err != nil {
-			log.Fatal(err)
-		}
-		serviceName := nameServiceMap[cf.Server.Name]
-		lbConfig := &etcd3.Config{
-			EtcdConfig: clientv3.Config{
-				//Endpoints:   ds.Config.Etcd.EndPoints,
-				Endpoints:   []string{"http://127.0.0.1:2379"},
-				DialTimeout: 5 * time.Second,
-			},
-			RegistryDir: serviceName,
-			Ttl:         time.Duration(cf.Etcd.Ttl) * time.Second,
-		}
-		register, _ := etcd3.NewRegistrar(lbConfig)
-		service := &registry.ServiceInfo{
-			InstanceId: *nodeID,
-			Name:       "test",
-			Version:    "1.0",
-			Address:    fmt.Sprintf("%s:%d", ip.String(), cf.Server.Port),
-			Metadata:   metadata.Pairs(common.WeightKey, "1"),
-		}
-		err = register.Register(service)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+	nameServiceMap, err := name_service.GetNameService()
+	if err != nil {
+		log.Fatal(err)
+	}
+	serviceName := nameServiceMap[cf.Server.Name]
+	lbConfig := &etcd3.Config{
+		EtcdConfig: clientv3.Config{
+			//Endpoints:   ds.Config.Etcd.EndPoints,
+			Endpoints:   []string{"http://127.0.0.1:2379"},
+			DialTimeout: 5 * time.Second,
+		},
+		RegistryDir: serviceName,
+		Ttl:         time.Duration(cf.Etcd.Ttl) * time.Second,
+	}
+	register, _ := etcd3.NewRegistrar(lbConfig)
+	service := &registry.ServiceInfo{
+		InstanceId: *nodeID,
+		Name:       "test",
+		Version:    "1.0",
+		Address:    fmt.Sprintf("%s:%d", ip.String(), cf.Server.Port),
+		Metadata:   metadata.Pairs(common.WeightKey, "1"),
+	}
+	err = register.Register(service)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// log
 	logPathMap := map[string]string{"access": cf.Log.AccessPath, "error": cf.Log.ErrorPath}
 	logCfg := &clog.Cfg{}
@@ -80,7 +79,23 @@ func main() {
 	}
 	accessLog := *l.Access()
 	errorLog := *l.Error()
-	// middleware
+
+	// conn rabbitmq
+	w := etcd3.NewWatcher(cf.Rabbitmq.Name, register.Etcd3Client)
+	addressList := w.GetAllAddresses()
+	// rabbitMq 连接池
+	var rbConnPools []*amqp.Connection
+	for _, address := range addressList {
+		addr := address.Addr
+		conn, err := amqp.Dial(fmt.Sprintf("amqp://admin:admin@%s", addr))
+		if err != nil {
+			errorLog.Errorf("Failed to connect to RabbitMQ, err=%v", err)
+			continue
+		}
+		defer conn.Close()
+		rbConnPools = append(rbConnPools, conn)
+	}
+	// register middleware
 	m := &middleware.M{
 		L: &accessLog,
 	}
@@ -110,8 +125,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// add server
-	orderCenter := center.NewOrderCenter(db, &errorLog)
+	orderCenter := center.NewOrderCenter(db, &errorLog, rbConnPools)
 	orderCenter.RegisterOrderCenter(e)
 	// run
 	_ = e.Run(fmt.Sprintf("%s:%d", ip.String(), cf.Server.Port))

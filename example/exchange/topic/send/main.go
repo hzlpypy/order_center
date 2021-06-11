@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/hzlpypy/common/utils"
 	"github.com/streadway/amqp"
 	"log"
 	"os"
@@ -55,8 +56,10 @@ func main() {
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plan",
-			Body:        []byte(msg),
+			ContentType:   "text/plan",
+			Body:          []byte(msg),
+			CorrelationId: utils.NewUUID(),
+			//ReplyTo:
 		},
 	)
 	failOnError(err, "Failed to publish a message")
