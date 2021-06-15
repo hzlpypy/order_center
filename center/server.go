@@ -1,6 +1,7 @@
 package center
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/hzlpypy/common/rabbitmq/topic"
 	"github.com/hzlpypy/common/utils"
@@ -70,7 +71,44 @@ func (o *OrderCenter) CreateOrder(c *gin.Context, req *Order) error {
 			o.l.WithField("Channel", "amqp channel error").Error(err)
 			return err
 		}
+		exchangeName := "order_exchange"
+		routingKey := "create_order"
+		contentType := "application/json"
+		ti, err := topic.NewTopicReq(c,&topic.TopicReq{
+			Conn: rbConn,
+			Ch: ch,
+			ExchangeName: "order_exchange",
+			ExchangeType: "topic",
+			Durable: true,
+			Msg: "",
+			ContentType: contentType,
+			RoutingKey: "create_order",
+			Queue: &topic.Queue{
+				QueueName: "order_queue",
+				QueueDeclareMap: map[string]interface{}{"x-max-length": 10},
+			},
+		})
+		if err != nil {
+			o.l.WithField("Channel", "amqp NewTopicReq error").Error(err)
+			return err
+		}
+		err = ti.CreateExchange()
+		if err != nil {
+			o.l.WithField("Channel", "amqp CreateExchange error").Error(err)
+			return err
+		}
+		err = ti.QueueDeclareAndBindRoutingKey()
+		if err != nil {
+			o.l.WithField("Channel", "amqp QueueDeclareAndBindRoutingKey error").Error(err)
+			return err
+		}
+		orderByte , _ := json.Marshal(order)
+		ch.Publish(exchangeName,routingKey,false,false,amqp.Publishing{
+			ContentType:contentType,
+			Body: orderByte,
+			CorrelationId:"",
 
+		})
 		return nil
 	})
 	if err != nil {
