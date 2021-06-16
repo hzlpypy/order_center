@@ -32,3 +32,8 @@ type Order struct {
 	FakeDelete int `gorm:"type:tinyint(1);default:1"`
 	// ...
 }
+
+type OrderMsg struct {
+	Order *Order   `json:"order"`
+	Msg   *Message `json:"msg"`
+}

@@ -11,9 +11,10 @@ import (
 type Config struct {
 	Model  string `yaml:"model"`
 	Server struct {
-		Ip   string `yaml:"ip"`
-		Port int    `yaml:"port"`
-		Name string `yaml:"name"`
+		Ip     string `yaml:"ip"`
+		Port   int    `yaml:"port"`
+		Name   string `yaml:"name"`
+		Ticker int    `yaml:"ticker"`
 	} `yaml:"server"`
 	Rabbitmq struct {
 		Name string `yaml:"name"`

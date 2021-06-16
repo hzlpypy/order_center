@@ -3,6 +3,7 @@ server:
   ip: 127.0.0.1
   port: 8089
   name: order_center
+  ticker: 5 #min
 rabbitmq:
   name: logic.rabbitmq
   user: admin

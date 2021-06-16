@@ -19,12 +19,18 @@ import (
 	"log"
 	"order_center/center"
 	"order_center/cmd/config"
+	"order_center/internal/ticker"
 	"order_center/middleware"
 	"os"
 	"time"
 )
 
 var nodeID = flag.String("node", "node1", "node ID")
+
+type CallbackGather struct {
+	OrderMsg      chan amqp.Delivery
+	CorrelationId string
+}
 
 func main() {
 	flag.Parse()
@@ -129,6 +135,8 @@ func main() {
 	// add server
 	orderCenter := center.NewOrderCenter(db, &errorLog, rbConnPools)
 	orderCenter.RegisterOrderCenter(e)
+	// add ticker
+	go ticker.TimeTicker(db, rbConnPools, &errorLog, cf.Server.Ticker)
 	// run
 	_ = e.Run(fmt.Sprintf("%s:%d", ip.String(), cf.Server.Port))
 }

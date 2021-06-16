@@ -13,4 +13,10 @@ type Message struct {
 	State int `gorm:"type:tinyint(1);default:1"`
 	// 消息内容
 	Content string `gorm:"type:varchar(512);not null"`
+	// rabbitmq队列信息
+	ExchangeName  string `gorm:"type:varchar(32);not null"`
+	RoutingKey    string `gorm:"type:varchar(32);not null"`
+	ContentType   string `gorm:"type:varchar(16);not null"`
+	CorrelationId string `gorm:"type:varchar(32);not null"`
+	QueueName     string `gorm:"type:varchar(32);not null"`
 }
