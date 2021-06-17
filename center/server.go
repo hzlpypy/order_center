@@ -52,23 +52,25 @@ func (o *OrderCenter) CreateOrder(c *gin.Context, req *Order) error {
 			o.l.WithField("CreateOrder", "create order error").Error(err)
 			return err
 		}
-		exchangeName := "order_exchange"
-		routingKey := "create_order"
-		contentType := "application/json"
-		queueName := "order_queue"
-		correlationId := utils.NewUUID()
+		//exchangeName := "order_exchange"
+		//routingKey := "create_order"
+		//contentType := "application/json"
+		//queueName := "order_queue"
+		//correlationId := utils.NewUUID()
 		// 入库消息存入本地消息库 message
 		messageID := utils.NewUUID()
 		message := &model.Message{
-			ID:            messageID,
-			Created:       int(time.Now().Unix()),
-			State:         1,
-			Content:       req.Content,
-			ExchangeName:  exchangeName,
-			RoutingKey:    routingKey,
-			ContentType:   contentType,
-			QueueName:     queueName,
-			CorrelationId: correlationId,
+			ID:         messageID,
+			Created:    int(time.Now().Unix()),
+			State:      1,
+			Content:    req.Content,
+			OrderID:    orderID,
+			RetryCount: 1,
+			//ExchangeName:  exchangeName,
+			//RoutingKey:    routingKey,
+			//ContentType:   contentType,
+			//QueueName:     queueName,
+			//CorrelationId: correlationId,
 		}
 		err = o.db.Model(model.Message{}).Create(message).Error
 		if err != nil {
@@ -95,10 +97,10 @@ func (o *OrderCenter) SendMsg(rbConn *amqp.Connection, c *gin.Context, order *mo
 		o.l.WithField("sendMsg", "amqp channel error").Error(err)
 		return err
 	}
-	exchangeName := message.ExchangeName
-	routingKey := message.RoutingKey
-	contentType := message.ContentType
-	queueName := message.QueueName
+	exchangeName := "order_exchange"
+	routingKey := "create_order"
+	contentType := "application/json"
+	queueName := "order_queue"
 	orderMsg := &model.OrderMsg{
 		Order: order,
 		Msg:   message,
@@ -132,12 +134,12 @@ func (o *OrderCenter) SendMsg(rbConn *amqp.Connection, c *gin.Context, order *mo
 		o.l.WithField("sendMsg", "amqp QueueDeclareAndBindRoutingKey error").Error(err)
 		return err
 	}
-	correlationId := utils.NewUUID()
+	//correlationId := utils.NewUUID()
 	err = ch.Publish(exchangeName, routingKey, false, false, amqp.Publishing{
-		ContentType:   contentType,
-		Body:          orderByte,
-		CorrelationId: correlationId,
-		ReplyTo:       queueName,
+		ContentType: contentType,
+		Body:        orderByte,
+		//CorrelationId: correlationId,
+		//ReplyTo:       queueName,
 	})
 	if err != nil {
 		o.l.WithField("sendMsg", "amqp Publish error").Error(err)
@@ -153,10 +155,12 @@ func (o *OrderCenter) getRmpCallback(confirmation <-chan amqp.Confirmation, orde
 	select {
 	case c := <-confirmation:
 		if c.Ack {
-			err := o.db.Model(&model.Message{}).Updates(&model.Message{Updated: int(time.Now().Unix()), State: 2}).Where("id", orderMsg.Msg.ID).Error
+			err := o.db.Model(&model.Message{}).Updates(
+				&model.Message{Updated: int(time.Now().Unix()), State: 2}).Where("id", orderMsg.Msg.ID).Error
 			if err != nil {
 				o.l.Errorf("GetCallback error, msgID=%s,err=%v", orderMsg.Msg.ID, err)
 			}
+			return
 		}
 	}
 }

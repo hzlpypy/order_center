@@ -4,7 +4,8 @@ package model
 type Message struct {
 	// 消息编号
 	ID string `gorm:"type:varchar(32);primary_key;"`
-	// UnixTime
+	// 订单ID
+	OrderID string `gorm:"type:varchar(32);not null"`
 	// 创建时间
 	Created int `gorm:"type:int(10);not null"`
 	Updated int `gorm:"type:int(10);default:0;autoUpdateTime;"`
@@ -13,10 +14,12 @@ type Message struct {
 	State int `gorm:"type:tinyint(1);default:1"`
 	// 消息内容
 	Content string `gorm:"type:varchar(512);not null"`
+	// 消息发送到mq次数
+	RetryCount int `gorm:"type:tinyint(1);default:1"`
 	// rabbitmq队列信息
-	ExchangeName  string `gorm:"type:varchar(32);not null"`
-	RoutingKey    string `gorm:"type:varchar(32);not null"`
-	ContentType   string `gorm:"type:varchar(16);not null"`
-	CorrelationId string `gorm:"type:varchar(32);not null"`
-	QueueName     string `gorm:"type:varchar(32);not null"`
+	//ExchangeName  string `gorm:"type:varchar(32);not null"`
+	//RoutingKey    string `gorm:"type:varchar(32);not null"`
+	//ContentType   string `gorm:"type:varchar(16);not null"`
+	//CorrelationId string `gorm:"type:varchar(32);not null"`
+	//QueueName     string `gorm:"type:varchar(32);not null"`
 }
