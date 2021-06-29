@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/hzlpypy/order_center/example/test_hello_world"
 	"github.com/streadway/amqp"
-	"order_center/example/test_hello_world"
 )
 
 func main() {

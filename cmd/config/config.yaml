@@ -1,7 +1,7 @@
 model: debug # release debug
 server:
   ip: 127.0.0.1
-  port: 8089
+  port: 8090
   name: order_center
   ticker: 5 #min
 rabbitmq:
@@ -13,7 +13,7 @@ mysql:
   port: 3306
   user: hzl
   pwd: hzl132773
-  db_name: demo1
+  db_name: order_center
   charset: utf8mb4
   conn_max_lifetime: 5
   max_idle_conns: 10
@@ -24,3 +24,7 @@ log:
   error_path: ./log/error_log.txt
 etcd:
   ttl: 10
+  ip: 127.0.0.1
+  port: 2379
+waybill_center:
+  name: logic.waybill_center

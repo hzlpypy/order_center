@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -9,18 +10,22 @@ import (
 	"github.com/hzlpypy/common/databases/mysql/v2"
 	"github.com/hzlpypy/common/name_service"
 	"github.com/hzlpypy/common/utils"
+	"github.com/hzlpypy/grpc-lb/balancer"
 	"github.com/hzlpypy/grpc-lb/common"
 	"github.com/hzlpypy/grpc-lb/registry"
 	etcd3 "github.com/hzlpypy/grpc-lb/registry/etcd3"
+	"github.com/hzlpypy/order_center/center"
+	"github.com/hzlpypy/order_center/cmd/config"
+	"github.com/hzlpypy/order_center/init_service"
+	"github.com/hzlpypy/order_center/internal/ticker"
+	"github.com/hzlpypy/order_center/middleware"
+	protos "github.com/hzlpypy/waybill_center/proto_info/protos"
+	"github.com/ozonru/etcd/v3/clientv3"
 	"github.com/streadway/amqp"
-	"go.etcd.io/etcd/clientv3"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"gorm.io/gorm/logger"
 	"log"
-	"order_center/center"
-	"order_center/cmd/config"
-	"order_center/internal/ticker"
-	"order_center/middleware"
 	"os"
 	"time"
 )
@@ -50,13 +55,13 @@ func main() {
 			Endpoints:   []string{"http://127.0.0.1:2379"},
 			DialTimeout: 5 * time.Second,
 		},
-		RegistryDir: serviceName,
+		RegistryDir: cf.Server.Name,
 		Ttl:         time.Duration(cf.Etcd.Ttl) * time.Second,
 	}
 	register, _ := etcd3.NewRegistrar(lbConfig)
 	service := &registry.ServiceInfo{
 		InstanceId: *nodeID,
-		Name:       "test",
+		Name:       serviceName,
 		Version:    "1.0",
 		Address:    fmt.Sprintf("%s:%d", ip.String(), cf.Server.Port),
 		Metadata:   metadata.Pairs(common.WeightKey, "1"),
@@ -65,6 +70,20 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// conn waybill_center
+	etcdConfig := clientv3.Config{
+		Endpoints: []string{fmt.Sprintf("http://%s:%d", cf.Etcd.Ip, cf.Etcd.Port)},
+	}
+	etcd3.RegisterResolver("etcd3", etcdConfig, cf.WaybillCenter.Name, "test", "1.0")
+
+	c, err := grpc.Dial("etcd3:///", grpc.WithInsecure(), grpc.WithBalancerName(balancer.RoundRobin))
+	if err != nil {
+		log.Printf("grpc dial: %s", err)
+		return
+	}
+	defer c.Close()
+	client := protos.NewWaybillCenterClient(c)
+
 	// log
 	logPathMap := map[string]string{"access": cf.Log.AccessPath, "error": cf.Log.ErrorPath}
 	logCfg := &clog.Cfg{}
@@ -131,12 +150,19 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// init service
+	i, err := init_service.NewInit(db, &errorLog)
+	if err != nil {
+		log.Fatal(err)
+	}
+	i.InitVCTable()
 	// add server
-	orderCenter := center.NewOrderCenter(db, &errorLog, rbConnPools)
+	orderCenter := center.NewOrderCenter(db, &errorLog, rbConnPools, client)
 	orderCenter.RegisterOrderCenter(e)
 	// add ticker
-	go ticker.TimeTicker(db, rbConnPools, &errorLog, cf.Server.Ticker)
+	ctx := context.Background()
+	defer ctx.Done()
+	go ticker.TimeTicker(db, rbConnPools, &errorLog, cf.Server.Ticker, ctx)
 	// run
 	_ = e.Run(fmt.Sprintf("%s:%d", ip.String(), cf.Server.Port))
 }

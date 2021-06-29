@@ -20,6 +20,7 @@ func main() {
 	}
 	defer conn.Close()
 	ch, err := conn.Channel()
+	//ch.Confirm()
 	if err != nil {
 		panic(fmt.Sprintf("make conn chan error, err=%v", err))
 	}
@@ -66,6 +67,7 @@ func main() {
 	failOnError(err, "Failed to register a consumer")
 	for msg := range msgs {
 		log.Printf(" [x] %s", msg.Body)
+		msg.Ack(false)
 	}
 	log.Printf(" [*] Waiting for logs. To exit press CTRL+C")
 	select {}

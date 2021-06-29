@@ -1,4 +1,6 @@
 # 分布式事务测试
+需求：
+    订单系统：用户下单商品 运单中心：接收商品分配外卖员
 组件：
     1.order_center 订单系统(go,mysql,gin,logrus)
     2.notify 通知系统(go,rabbitmq,grpc,logrus)

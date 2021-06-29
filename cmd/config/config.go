@@ -38,8 +38,13 @@ type Config struct {
 		ErrorPath  string `yaml:"error_path"`
 	} `yaml:"log"`
 	Etcd struct {
-		Ttl int `yaml:"ttl"`
+		Ttl  int    `yaml:"ttl"`
+		Ip   string `yaml:"ip"`
+		Port int    `yaml:"port"`
 	} `yaml:"etcd"`
+	WaybillCenter struct {
+		Name string `yaml:"name"`
+	} `yaml:"waybill_center"`
 }
 
 func NewConfig() *Config {

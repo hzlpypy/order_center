@@ -12,8 +12,8 @@ type M struct {
 
 func (m *M) Access(c *gin.Context) {
 	now := time.Now().Unix()
-	m.L.Info("access")
+	m.L.Infof("access time = %d", now)
 	c.Next()
 	end := time.Now().Unix()
-	m.L.Infof("req time = %ds", end-now)
+	m.L.Infof("req time consuming = %ds", end-now)
 }
