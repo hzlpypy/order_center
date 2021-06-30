@@ -3,7 +3,6 @@ package test_hello_world
 import (
 	"github.com/streadway/amqp"
 	"log"
-	"time"
 )
 
 func Receive(ch *amqp.Channel) {
@@ -34,9 +33,8 @@ func Receive(ch *amqp.Channel) {
 	go func() {
 		for msg := range msgs {
 			log.Printf("Received a message : %s", msg.Body)
-			time.Sleep(10 * time.Second)
 			// 确认收到消息，参照TCP
-			err = msg.Ack(false)
+			//err = msg.Ack(false)
 		}
 	}()
 	select {}

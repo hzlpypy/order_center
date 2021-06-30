@@ -23,7 +23,7 @@ func (o *OrderCenter) CreateOrderController(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, `{"code":200,"msg":"ok"}`)
 	return
 }
 

@@ -21,7 +21,7 @@ func TimeTicker(db *gorm.DB, rbConnPools []*amqp.Connection, l *logrus.Logger, i
 		select {
 		case <-ticker.C:
 			// 需要重试的message
-			log.Print("ticker             ticker")
+			log.Print("ticker      start")
 			var sMessages []*model.Message
 			err := db.Model(&model.Message{}).Where("state", 1).Where(fmt.Sprintf("retry_count<=%d", 5)).Find(&sMessages).Error
 			if err != nil {
@@ -38,9 +38,6 @@ func TimeTicker(db *gorm.DB, rbConnPools []*amqp.Connection, l *logrus.Logger, i
 				}
 				// todo notify admin
 			}()
-			if len(rbConnPools) == 0 {
-				panic("len(rbConnPools) == 0")
-			}
 			rbConn := rbConnPools[0]
 			if len(rbConnPools) >= 2 {
 				rbConn = rbConnPools[rand.Intn(len(rbConnPools)-1)]

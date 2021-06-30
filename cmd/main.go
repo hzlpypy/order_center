@@ -120,6 +120,9 @@ func main() {
 		defer conn.Close()
 		rbConnPools = append(rbConnPools, conn)
 	}
+	if len(rbConnPools) == 0 {
+		log.Fatal("len(rbConnPools) == 0")
+	}
 	// register middleware
 	m := &middleware.M{
 		L: &accessLog,
