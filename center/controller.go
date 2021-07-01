@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 func (o *OrderCenter) CreateOrderController(c *gin.Context) {
@@ -28,13 +29,20 @@ func (o *OrderCenter) CreateOrderController(c *gin.Context) {
 }
 
 func (o *OrderCenter) ListOrderController(c *gin.Context) {
-	reqBody := c.Request.Body
-	bytes, _ := ioutil.ReadAll(reqBody)
-	req := &OrderListReq{}
-	err := json.Unmarshal(bytes, req)
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "bad request")
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
+	}
+	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", "1"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	req := &OrderListReq{
+		Page:       page,
+		PageSize:   pageSize,
+		SearchInfo: c.DefaultQuery("search_info", ""),
 	}
 	orderList, err := o.ListOrder(c, req)
 	if err != nil {

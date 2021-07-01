@@ -150,12 +150,13 @@ func (o *OrderCenter) getRmpCallback(confirmation <-chan amqp.Confirmation, orde
 func (o *OrderCenter) ListOrder(c *gin.Context, req *OrderListReq) (*OrderList, error) {
 	// get orders
 	searchKeys := []string{"id", "store_name", "content"}
-	db := o.db
+	db := o.db.Model(model.Order{})
 	for _, searchKey := range searchKeys {
-		db = o.db.Model(model.Order{}).Or(fmt.Sprintf("%s like ?%", searchKey), req.SearchInfo)
+		where := fmt.Sprintf("%s like ?", searchKey)
+		db = db.Or(where, req.SearchInfo+"%")
 	}
 	orders := []*model.Order{}
-	err := db.Find(orders).Error
+	err := db.Find(&orders).Error
 	if err != nil {
 		o.l.Errorf("Find orders error,err=%s", err)
 		return nil, err
