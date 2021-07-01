@@ -44,6 +44,7 @@ type Config struct {
 	} `yaml:"etcd"`
 	WaybillCenter struct {
 		Name string `yaml:"name"`
+		NameService string `yaml:"name_service"`
 	} `yaml:"waybill_center"`
 }
 

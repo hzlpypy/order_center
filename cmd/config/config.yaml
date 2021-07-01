@@ -27,4 +27,5 @@ etcd:
   ip: 127.0.0.1
   port: 2379
 waybill_center:
-  name: logic.waybill_center
+  name: waybill_center
+  name_service: logic.waybill_center

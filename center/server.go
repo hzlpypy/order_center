@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	cm "github.com/hzlpypy/common/databases/mysql"
 	"github.com/hzlpypy/common/utils"
 	"github.com/hzlpypy/order_center/model"
 	protos "github.com/hzlpypy/waybill_center/proto_info/protos"
@@ -156,7 +157,10 @@ func (o *OrderCenter) ListOrder(c *gin.Context, req *OrderListReq) (*OrderList, 
 		db = db.Or(where, req.SearchInfo+"%")
 	}
 	orders := []*model.Order{}
-	err := db.Find(&orders).Error
+	var total int64
+	limit, offect := cm.GetLimitOffset(int32(req.Page), int32(req.PageSize))
+	db = db.Limit(int(limit)).Offset(int(offect))
+	err := db.Count(&total).Find(&orders).Error
 	if err != nil {
 		o.l.Errorf("Find orders error,err=%s", err)
 		return nil, err
@@ -200,5 +204,10 @@ func (o *OrderCenter) ListOrder(c *gin.Context, req *OrderListReq) (*OrderList, 
 			FakeDelete:       order.FakeDelete,
 		}
 	}
-	return nil, nil
+	return &OrderList{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Total:    int(total),
+		Orders:   resOrders,
+	}, nil
 }

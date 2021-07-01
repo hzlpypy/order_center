@@ -48,21 +48,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	serviceName := nameServiceMap[cf.Server.Name]
+	registerDir := nameServiceMap[cf.Server.Name]
+	serverVersion := "1.0"
 	lbConfig := &etcd3.Config{
 		EtcdConfig: clientv3.Config{
 			//Endpoints:   ds.Config.Etcd.EndPoints,
 			Endpoints:   []string{"http://127.0.0.1:2379"},
 			DialTimeout: 5 * time.Second,
 		},
-		RegistryDir: cf.Server.Name,
+		RegistryDir: registerDir,
 		Ttl:         time.Duration(cf.Etcd.Ttl) * time.Second,
 	}
 	register, _ := etcd3.NewRegistrar(lbConfig)
 	service := &registry.ServiceInfo{
 		InstanceId: *nodeID,
-		Name:       serviceName,
-		Version:    "1.0",
+		Name:       cf.Server.Name,
+		Version:    serverVersion,
 		Address:    fmt.Sprintf("%s:%d", ip.String(), cf.Server.Port),
 		Metadata:   metadata.Pairs(common.WeightKey, "1"),
 	}
@@ -74,7 +75,7 @@ func main() {
 	etcdConfig := clientv3.Config{
 		Endpoints: []string{fmt.Sprintf("http://%s:%d", cf.Etcd.Ip, cf.Etcd.Port)},
 	}
-	etcd3.RegisterResolver("etcd3", etcdConfig, cf.WaybillCenter.Name, "test", "1.0")
+	etcd3.RegisterResolver("etcd3", etcdConfig, cf.WaybillCenter.NameService,  cf.WaybillCenter.Name, serverVersion)
 
 	c, err := grpc.Dial("etcd3:///", grpc.WithInsecure(), grpc.WithBalancerName(balancer.RoundRobin))
 	if err != nil {
