@@ -53,7 +53,7 @@ func main() {
 	lbConfig := &etcd3.Config{
 		EtcdConfig: clientv3.Config{
 			//Endpoints:   ds.Config.Etcd.EndPoints,
-			Endpoints:   []string{"http://127.0.0.1:2379"},
+			Endpoints:   []string{fmt.Sprintf("http://%s:%d", cf.Etcd.Ip, cf.Etcd.Ttl)},
 			DialTimeout: 5 * time.Second,
 		},
 		RegistryDir: registerDir,
@@ -75,7 +75,7 @@ func main() {
 	etcdConfig := clientv3.Config{
 		Endpoints: []string{fmt.Sprintf("http://%s:%d", cf.Etcd.Ip, cf.Etcd.Port)},
 	}
-	etcd3.RegisterResolver("etcd3", etcdConfig, cf.WaybillCenter.NameService,  cf.WaybillCenter.Name, serverVersion)
+	etcd3.RegisterResolver("etcd3", etcdConfig, cf.WaybillCenter.NameService, cf.WaybillCenter.Name, serverVersion)
 
 	c, err := grpc.Dial("etcd3:///", grpc.WithInsecure(), grpc.WithBalancerName(balancer.RoundRobin))
 	if err != nil {
