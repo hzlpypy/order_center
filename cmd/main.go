@@ -53,7 +53,7 @@ func main() {
 	lbConfig := &etcd3.Config{
 		EtcdConfig: clientv3.Config{
 			//Endpoints:   ds.Config.Etcd.EndPoints,
-			Endpoints:   []string{fmt.Sprintf("http://%s:%d", cf.Etcd.Ip, cf.Etcd.Ttl)},
+			Endpoints:   []string{fmt.Sprintf("http://%s:%d", cf.Etcd.Ip, cf.Etcd.Port)},
 			DialTimeout: 5 * time.Second,
 		},
 		RegistryDir: registerDir,
