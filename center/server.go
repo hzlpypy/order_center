@@ -17,6 +17,7 @@ import (
 	"time"
 )
 
+
 type OrderCenter struct {
 	db          *gorm.DB
 	l           *logrus.Logger
@@ -32,6 +33,9 @@ func NewOrderCenter(db *gorm.DB, errorLog *logrus.Logger, rbConnPools []*amqp.Co
 		client:      client,
 	}
 }
+
+// check 所有的接口是否实现
+// var _ Interface = (*OrderCenter)(nil)
 
 // CreateOrder: 创建订单
 func (o *OrderCenter) CreateOrder(c *gin.Context, req *OrderReq) error {
